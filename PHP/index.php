@@ -1,18 +1,19 @@
-# web-proxy
-A handy web proxy developed in different languages!
-
-# Using
-For PHP:
-
-```bash
 <?php
-$proxy_url = 'https://www.google.com';
-$proxy_url = base64_encode($proxy_url);
-$proxy_url = urlencode($proxy_url);
+if(!isset($_GET['u'])){
+    echo $_SERVER['SERVER_ADDR'];
+    exit();
+}
+
+
+$url = $_GET['u'];
+$url = urldecode($url);
+$url = base64_decode($url);
+//echo $url;
 
 $curl = curl_init();
+
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://your-url.com/?u=' . $proxy_url,
+  CURLOPT_URL => $url,
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -26,7 +27,11 @@ curl_setopt_array($curl, array(
 ));
 
 $response = curl_exec($curl);
+$statusCode = curl_getinfo($curl,CURLINFO_HTTP_CODE);
 
 curl_close($curl);
+
+header('Content-Type: application/json; charset=utf-8');
+http_response_code($statusCode);
 echo $response;
-```
+exit();
